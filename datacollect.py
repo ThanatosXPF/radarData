@@ -14,7 +14,12 @@ def countMonth():
         month = file[14:18]
         if month not in list:
             list.append(month)
-    print(list)
+    print(list.sort())
     print(len(list))
-
-countMonth()
+def grabSomeData():
+    file_path = '2017_500'
+    filelist = os.listdir(file_path)
+    for file in file_path:
+        if "20170501" in file:
+            shutil.copy(os.path.join(file_path,file),"20170501_500")
+grabSomeData()
