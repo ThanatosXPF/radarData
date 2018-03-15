@@ -2,7 +2,7 @@ import os
 import re
 import shutil
 import numpy as np
-filename = "~/radar/radar_reflect_data_2017/REFdata/"
+filename = "/home/thanatos/Documents/radar_reflect_data_2017/REFdata/"
 filelist = os.listdir(filename)
 def find500():
     for file in filelist:
