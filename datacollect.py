@@ -14,8 +14,7 @@ def countMonth():
         month = file[14:18]
         if month not in list:
             list.append(month)
-    list = np.array(list).reshape(12,)
     print(list)
-    print(list.size)
+    print(len(list))
 
 countMonth()
