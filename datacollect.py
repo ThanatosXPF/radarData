@@ -29,4 +29,5 @@ def grabSomeData():
 
 def radarAnalyze():
     pass
-grabSomeData()
+#grabSomeData()
+find3500()
