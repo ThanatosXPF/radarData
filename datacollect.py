@@ -58,8 +58,10 @@ def radarAnalyze():
     Y = []
     aws_dir = "aws2017_0405"
     aws_dirs = os.listdir(aws_dir)
+    print("aws_dir : "+ str(aws_dirs[:5]))
     radar_path = "2017_2500"
     radar_files = os.listdir(radar_path)
+    print("radar_file : " + str(radar_files[:5]))
     for aws_hour in aws_dirs:
         hours = os.listdir(os.path.join(aws_dir, aws_hour))
         path = os.path.join(aws_dir, aws_hour)
