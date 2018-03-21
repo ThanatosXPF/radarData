@@ -62,27 +62,49 @@ def radarAnalyze():
     radar_path = "2017_2500"
     radar_files = os.listdir(radar_path)
     print("radar_file : " + str(radar_files[:5]))
+
+    total = len(aws_dirs)
+    i = 0.0
+
     for aws_hour in aws_dirs:
+
+        print(aws_hour)
+
         hours = os.listdir(os.path.join(aws_dir, aws_hour))
         path = os.path.join(aws_dir, aws_hour)
+        # print(path)
+        #print("radar_file : " + str(hours[:5]))
         for hour in hours:
-            if len(hour) <= 20:
-                path = os.path.join(path, hour)
-                hour = hour[8:17]
+            if len(hour) >= 21:
+                # print(hour)
+                path2 = os.path.join(path, hour)
+                hour = hour[8:16]
+                # print(path2)
+                print(hour)
                 for file in radar_files:
-                    if hour in file:
-                        x, y = getConbineData(loadref(file), loadaws(path))
+                    # print(file)
+                    if file[14:22] == hour:
+                        # print(hour)
+                        # print file
+                        # print(path2)
+                        print("find correlative radar!")
+                        x, y = getConbineData(loadref(file), loadaws(path2))
                         X.extend(x)
                         Y.extend(y)
+
     X = np.array(X).reshape((len(X),1))
     Y = np.array(Y).reshape((len(Y),1))
 
+    print(X[:100])
+    # np.savetxt("X.txt",X)
+    # np.savetxt("Y.txt",Y)
+    # X.tofile("X")
+    # Y.tofile("Y")
     np.save("X.npy",X)
     np.save("Y.npy",Y)
 
-
 def loadref(file):
-    image = np.fromfile("2017_2500/" + file, dtype=np.uint8).reshape(700, 900)
+    image = np.fromfile("2017_2500_hour/" + file, dtype=np.uint8).reshape(700, 900)
     image[np.where(image == 125)] = 0
     image[np.where(image <= 15)] = 0
     image[np.where(image > 80)] = 0
@@ -91,7 +113,10 @@ def loadref(file):
 
 
 def loadaws(file):
-    aws = np.fromfile(file, dtype=np.uint32, sep=" ")
+    num = int(file[-8:-4])
+    # print(num)
+    aws = np.fromfile(file, dtype=np.float, sep=" ").reshape(num,5)
+    # print(aws[:5])
     return aws
 
 
@@ -99,10 +124,12 @@ def getConbineData(image, aws):
     X = []
     Y = []
     for line in aws:
-        x = line[1]
-        y = line[2]
+        x = int(line[1])
+        y = int(line[2])
         rain = line[4]
-        factor = image[x][y]
+        factor = image[y][x]
+        if rain == -99.0:
+            continue
         X.append(rain)
         Y.append(factor)
     return X, Y
@@ -112,3 +139,4 @@ def getConbineData(image, aws):
 # find3500()
 #classify_AWS()
 radarAnalyze()
+#loadaws("aws2017_0405/2017041108-2017041111/AWS_201704110800_2309.txt")
