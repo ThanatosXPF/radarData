@@ -2,6 +2,11 @@ import os
 import re
 import shutil
 import numpy as np
+from pylab import * 
+from sklearn import linear_model
+import matplotlib.pyplot as plt
+from pandas import DataFrame
+plt.switch_backend('agg')
 '''
 filename = "/home/thanatos/Documents/radar_reflect_data_2017/REFdata/"
 filelist = os.listdir(filename)
@@ -59,7 +64,7 @@ def radarAnalyze():
     aws_dir = "aws2017_0405"
     aws_dirs = os.listdir(aws_dir)
     print("aws_dir : "+ str(aws_dirs[:5]))
-    radar_path = "2017_2500"
+    radar_path = "2017_2500_hour_accumulate"
     radar_files = os.listdir(radar_path)
     print("radar_file : " + str(radar_files[:5]))
 
@@ -83,7 +88,7 @@ def radarAnalyze():
                 print(hour)
                 for file in radar_files:
                     # print(file)
-                    if file[14:22] == hour:
+                    if file[4:12] == hour:
                         # print(hour)
                         # print file
                         # print(path2)
@@ -102,13 +107,43 @@ def radarAnalyze():
     # Y.tofile("Y")
     np.save("X.npy",X)
     np.save("Y.npy",Y)
+    '''
+    def train_wb(X, y):
+        if np.linalg.det(X.T * X) != 0:
+            wb = ((X.T.dot(X).I).dot(X.T)).dot(y)
+            return wb
+
+    def draw(x, y, wb):
+        a = np.linspace(0, np.max(x))
+        b = wb[0] + a * wb[1]
+        plot(x, y, '.')
+        plot(a, b)
+        show()
+
+    wb = train_wb(X, Y)
+    draw(X[:, 1], Y, wb.tolist())
+    '''
+    X = log(X)
+    Y = log(Y)
+    df = DataFrame(Y,columns = ["factor"])
+    regr = linear_model.LinearRegression()
+    regr.fit(df["factor"].reshape(-1,1),X)
+
+    a,b = regr.coef_,regr.intercept_
+    print a
+    print b
+
+    plt.scatter(Y,X,color = "blue",s = 1)
+    plt.plot(Y,regr.predict(df["factor"].reshape(-1,1)),color = 'red',linewidth=4)
+    # plt.show()
+    plt.savefig("result_log.jpg")
 
 def loadref(file):
-    image = np.fromfile("2017_2500_hour/" + file, dtype=np.uint8).reshape(700, 900)
-    image[np.where(image == 125)] = 0
-    image[np.where(image <= 15)] = 0
-    image[np.where(image > 80)] = 0
-    image = image * 3 + 5
+    image = np.load("2017_2500_hour_accumulate/" + file)
+    # image[np.where(image == 125)] = 0
+    # image[np.where(image <= 15)] = 0
+    # image[np.where(image > 80)] = 0
+    # image = image * 3 + 5
     return image
 
 
@@ -127,8 +162,14 @@ def getConbineData(image, aws):
         x = int(line[1])
         y = int(line[2])
         rain = line[4]
+        if rain == 0.0:
+            continue
         factor = image[y][x]
+        if factor == 0:
+            continue
         if rain == -99.0:
+            continue
+        if factor == 0:
             continue
         X.append(rain)
         Y.append(factor)
