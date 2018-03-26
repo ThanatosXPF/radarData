@@ -1,8 +1,7 @@
 import os
-import re
 import shutil
 import numpy as np
-from pylab import * 
+from pylab import *
 from sklearn import linear_model
 import matplotlib.pyplot as plt
 from pandas import DataFrame
@@ -50,12 +49,12 @@ def classify_AWS():
             shutil.copytree(os.path.join(aws_dir, dir), "aws2017_0405/" + dir)
 
 
-def getTraindata():
-    rafar_dir = "2017_3500"
-    aws_dir = "AWSTypes/output"
-    aws_days = os.listdir(aws_dir)
-    for aws_day in aws_days:
-        day = aws_day[:8]
+# def getTraindata():
+#     rafar_dir = "2017_3500"
+#     aws_dir = "AWSTypes/output"
+#     aws_days = os.listdir(aws_dir)
+#     for aws_day in aws_days:
+#         day = aws_day[:8]
 
 
 def radarAnalyze():
@@ -63,14 +62,12 @@ def radarAnalyze():
     Y = []
     aws_dir = "aws2017_0405"
     aws_dirs = os.listdir(aws_dir)
-    print("aws_dir : "+ str(aws_dirs[:5]))
+    print("aws_dir : " + str(aws_dirs[:5]))
     radar_path = "2017_2500_hour_accumulate"
     radar_files = os.listdir(radar_path)
     print("radar_file : " + str(radar_files[:5]))
 
-    total = len(aws_dirs)
-    i = 0.0
-
+    # total = len(aws_dirs)
     for aws_hour in aws_dirs:
 
         print(aws_hour)
@@ -78,7 +75,7 @@ def radarAnalyze():
         hours = os.listdir(os.path.join(aws_dir, aws_hour))
         path = os.path.join(aws_dir, aws_hour)
         # print(path)
-        #print("radar_file : " + str(hours[:5]))
+        # print("radar_file : " + str(hours[:5]))
         for hour in hours:
             if len(hour) >= 21:
                 # print(hour)
@@ -97,16 +94,16 @@ def radarAnalyze():
                         X.extend(x)
                         Y.extend(y)
 
-    X = np.array(X).reshape((len(X),1))
-    Y = np.array(Y).reshape((len(Y),1))
+    X = np.array(X).reshape((len(X), 1))
+    Y = np.array(Y).reshape((len(Y), 1))
 
     print(X[:100])
     # np.savetxt("X.txt",X)
     # np.savetxt("Y.txt",Y)
     # X.tofile("X")
     # Y.tofile("Y")
-    np.save("X.npy",X)
-    np.save("Y.npy",Y)
+    np.save("X.npy", X)
+    np.save("Y.npy", Y)
     '''
     def train_wb(X, y):
         if np.linalg.det(X.T * X) != 0:
@@ -125,18 +122,20 @@ def radarAnalyze():
     '''
     X = log(X)
     Y = log(Y)
-    df = DataFrame(Y,columns = ["factor"])
+    df = DataFrame(Y, columns=["factor"])
     regr = linear_model.LinearRegression()
-    regr.fit(df["factor"].reshape(-1,1),X)
+    regr.fit(df["factor"].reshape(-1, 1), X)
 
-    a,b = regr.coef_,regr.intercept_
+    a, b = regr.coef_, regr.intercept_
     print a
     print b
 
-    plt.scatter(Y,X,color = "blue",s = 1)
-    plt.plot(Y,regr.predict(df["factor"].reshape(-1,1)),color = 'red',linewidth=4)
+    plt.scatter(Y, X, color="blue", s=1)
+    plt.plot(Y, regr.predict(
+        df["factor"].reshape(-1, 1)), color='red', linewidth=4)
     # plt.show()
     plt.savefig("result_log.jpg")
+
 
 def loadref(file):
     image = np.load("2017_2500_hour_accumulate/" + file)
@@ -150,7 +149,7 @@ def loadref(file):
 def loadaws(file):
     num = int(file[-8:-4])
     # print(num)
-    aws = np.fromfile(file, dtype=np.float, sep=" ").reshape(num,5)
+    aws = np.fromfile(file, dtype=np.float, sep=" ").reshape(num, 5)
     # print(aws[:5])
     return aws
 
@@ -178,6 +177,6 @@ def getConbineData(image, aws):
 
 # grabSomeData()
 # find3500()
-#classify_AWS()
+# classify_AWS()
 radarAnalyze()
-#loadaws("aws2017_0405/2017041108-2017041111/AWS_201704110800_2309.txt")
+# loadaws("aws2017_0405/2017041108-2017041111/AWS_201704110800_2309.txt")
